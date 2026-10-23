@@ -1,0 +1,14 @@
+
+import { Router } from 'express';
+import * as controller from './movimentacaoController.js';
+import { autenticar } from '../middlewares/auth.js';
+
+const router = Router();
+
+router.use(autenticar);
+
+router.post('/', controller.movimentar);
+router.get('/', controller.listar);
+router.get('/produto/:produtoId', controller.listarPorProduto);
+
+export default router;

@@ -1,0 +1,53 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Papel {
+  OPERADOR
+  ADMINISTRADOR
+}
+
+model Usuario {
+  id           Int      @id @default(autoincrement())
+  nome         String
+  email        String   @unique
+  senhaHash    String   @map("senha_hash")
+  papel        Papel    @default(OPERADOR)
+  criadoEm     DateTime @default(now()) @map("criado_em")
+  movimentacoes Movimentacao[]
+
+  @@map("usuario")
+}
+
+model Produto {
+  id            Int            @id @default(autoincrement())
+  nome          String
+  quantidade    Int
+  limiteMinimo  Int            @map("limite_minimo")
+  criadoEm      DateTime       @default(now()) @map("criado_em")
+  movimentacoes Movimentacao[]
+
+  @@map("produto")
+}
+
+model Movimentacao {
+  id               Int      @id @default(autoincrement())
+  tipo             String
+  quantidade       Int
+  dataMovimentacao DateTime @default(now()) @map("data_movimentacao")
+  produtoId        Int      @map("produto_id")
+  usuarioId        Int      @map("usuario_id")
+
+  produto Produto @relation(fields: [produtoId], references: [id], onDelete: Restrict)
+  usuario Usuario @relation(fields: [usuarioId], references: [id], onDelete: Restrict)
+
+  @@index([produtoId])
+  @@index([usuarioId])
+  @@map("movimentacao")
+}
